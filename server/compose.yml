@@ -1,0 +1,56 @@
+name: freereps
+
+services:
+  db:
+    image: timescale/timescaledb:latest-pg16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-freereps}
+      POSTGRES_USER: ${POSTGRES_USER:-freereps}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-freereps}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  freereps:
+    image: meltforce/freereps:${VERSION:-latest}
+    environment:
+      FREEREPS_DB_HOST: db
+      FREEREPS_DB_PORT: "5432"
+      FREEREPS_DB_NAME: ${POSTGRES_DB:-freereps}
+      FREEREPS_DB_USER: ${POSTGRES_USER:-freereps}
+      FREEREPS_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      TS_AUTHKEY: ${TS_AUTHKEY:-}
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - tsnet-state:/app/tsnet-state
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  pgdata:
+  tsnet-state:
+
+networks:
+  internal:
+    driver: bridge

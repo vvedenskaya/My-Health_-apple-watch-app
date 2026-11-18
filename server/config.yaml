@@ -1,0 +1,69 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+  # Origin the OAuth redirect URIs are built from. Leave it out and each flow
+  # derives it from the request that started it — the address you reached
+  # FreeReps on — so a fresh installation needs nothing here. Set it behind a
+  # reverse proxy under a different name, or where the UI answers on several
+  # names while the provider accepts one registered URI. Scheme and host only.
+  # base_url: "https://freereps.example.ts.net"
+
+database:
+  # Overridden by FREEREPS_DB_* from compose.yml / .env.
+  host: "db"
+  port: 5432
+  name: "freereps"
+  user: "freereps"
+  password: "set-in-.env"
+  sslmode: "disable"
+
+tailscale:
+  enabled: true
+  hostname: "freereps"
+  state_dir: "tsnet-state"
+
+ingest:
+  # The zone the Alpha Progression CSV's session times are read in. The export
+  # carries a bare wall clock with no zone, and the resulting instant is part of
+  # a workout_sets row's natural key, so this value must be the same on every
+  # host that imports — reading one export in two zones stores every session
+  # twice. Startup fails on an unknown zone, on "" and on "Local".
+  session_timezone: "America/New_York"
+
+oura:
+  sync_interval: "30m"   # how often to poll Oura API (per-user creds configured in Settings UI)
+  backfill_days: 90      # days of history to fetch on first sync
+
+hevy:
+  sync_interval: "30m"   # how often to poll the Hevy event feed (API key configured in Settings UI)
+
+opengym:
+  sync_interval: "30m"   # how often to check the openGym state for changes (instance paired in Settings UI)
+
+withings:
+  sync_interval: "30m"   # how often to poll Withings (per-user creds configured in Settings UI)
+  backfill_days: 90      # days of history to fetch on first sync
+
+# Alerts: a POST to an ntfy topic, one monitor id per condition. `format: ntfy`
+# sends a text notification with title and priority; `format: kuma-json` sends
+# Uptime Kuma's webhook object for a program to parse. See the Alerts section of
+# README.md.
+#
+# These values seed the `alert_settings` row on first start only. After that the
+# Settings screen (Settings -> Alerts) owns them and this block is ignored, so a
+# redeploy cannot overwrite what was entered there.
+alerts:
+  enabled: false
+  ntfy_url: "https://ntfy.example.com/freereps-alerts"
+  format: "ntfy"         # or "kuma-json"
+  hostname: "freereps"
+  check_interval: "5m"
+  failure_threshold: 3   # consecutive failed runs of one source for one user
+  apple_silence: "36h"   # no Health Auto Export delivery for this long
+
+# Which source wins when two of them cover the same measurement. Named entries
+# match by prefix; "" is the empty source Health Auto Export writes.
+source_priority:
+  - "Withings"
+  - "Oura"
+  - ""

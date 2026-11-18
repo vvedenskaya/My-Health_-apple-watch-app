@@ -1,0 +1,49 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Start a ${applicationName} sync" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Starte ${applicationName} Sync"
+          }
+        }
+      }
+    },
+    "Sync ${applicationName}" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "${applicationName} synchronisieren"
+          }
+        },
+        "en" : {
+          "stringSet" : {
+            "state" : "new",
+            "values" : [
+              "Sync ${applicationName}",
+              "Sync health data with ${applicationName}",
+              "Start a ${applicationName} sync"
+            ]
+          }
+        }
+      }
+    },
+    "Sync health data with ${applicationName}" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesundheitsdaten mit ${applicationName} synchronisieren"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
